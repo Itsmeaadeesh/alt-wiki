@@ -1,26 +1,89 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --wiki-serif: var(--font-wiki-serif), "Linux Libertine", "Linux Libertine O", "Georgia", "Times New Roman", serif;
+  --wiki-sans: var(--font-wiki-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Lato, Helvetica, Arial, sans-serif;
+  --wiki-link: #0645ad;
+  --wiki-link-visited: #0b0080;
+  --wiki-link-hover: #0b0080;
+  --wiki-border: #a2a9b1;
+  --wiki-border-light: #eaecf0;
+  --wiki-bg-gray: #f8f9fa;
+  --wiki-text: #202122;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--wiki-sans);
+  color: var(--wiki-text);
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Wikipedia typography and links */
+.font-wiki-serif {
+  font-family: var(--wiki-serif);
+}
+
+.font-wiki-sans {
+  font-family: var(--wiki-sans);
+}
+
+.wiki-link {
+  color: #0645ad;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.wiki-link:hover {
+  text-decoration: underline;
+  color: #0b0080;
+}
+
+.wiki-link:visited {
+  color: #0b0080;
+}
+
+/* Wikipedia heading border */
+.wiki-heading {
+  border-bottom: 1px solid #a2a9b1;
+  font-family: var(--wiki-serif);
+  font-weight: 400;
+  color: #000000;
+}
+
+/* Wikipedia infobox styling */
+.wiki-infobox {
+  border: 1px solid #a2a9b1;
+  background-color: #f8f9fa;
+  color: #202122;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.wiki-infobox th {
+  background-color: #b0c4de;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 6px 8px;
+}
+
+.wiki-infobox td {
+  padding: 4px 8px;
+}
+
+/* Wikipedia Table of contents */
+.wiki-toc {
+  background-color: #f8f9fa;
+  border: 1px solid #a2a9b1;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* Smooth anchor scrolling */
+html {
+  scroll-behavior: smooth;
 }
