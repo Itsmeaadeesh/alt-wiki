@@ -9,10 +9,14 @@ export async function generateWikiArticle(premise: string): Promise<WikiArticle>
 
   // Instant match for pre-built high-quality presets
   for (const [key, article] of Object.entries(SAMPLE_ARTICLES)) {
+    const pLower = article.premise.toLowerCase();
+    const tLower = article.title.toLowerCase();
     if (
-      cleanPremise === article.premise.toLowerCase() ||
+      cleanPremise === pLower ||
       cleanPremise.includes(key) ||
-      cleanPremise === key
+      pLower.includes(cleanPremise) ||
+      cleanPremise.includes(tLower) ||
+      tLower.includes(cleanPremise)
     ) {
       return article;
     }
@@ -35,8 +39,8 @@ CRITICAL TONE AND STYLE GUIDELINES:
 4. ARTICLE LEAD: The first paragraph MUST begin by defining the subject, with the title bolded (you can format it or we bold the first mention), explaining when it occurred/evolved, its significance, and scope.
 5. CITATIONS: In the text of the lead and sections, embed reference numbers like [1], [2], [3] smoothly at the end of factual assertions. Provide 5 to 8 corresponding realistic, academic-format references in the 'references' array (author, year, book/journal in quotes/italics, pages, publisher/DOI).
 6. INFOBOX: Provide 6 to 8 realistic, topic-appropriate key-value fields with a descriptive image caption. Choose an imageType from: "history", "specimen", "device", "geography", "event", "portrait".
-7. SECTIONS: Generate 4 to 6 detailed sections with numbered hierarchical structure (e.g., 1 Background, 1.1 Precursor events, 2 Expansion, 3 Impact, 4 Controversies).
-8. WORD COUNT: The article should be comprehensive and realistic (800 to 1,400 words total across lead and sections).
+7. SECTIONS: Generate 4 to 5 detailed sections with numbered hierarchical structure (e.g., 1 Background, 2 Development/Anatomy, 3 Impact/Ecology, 4 Legacy).
+8. WORD COUNT: Concise, encyclopedic paragraphs (around 600 to 900 words total across lead and sections).
 9. CATEGORIES: Include 4 to 6 plausible Wikipedia categories.
 
 Output MUST be strictly valid JSON matching this JSON schema:
@@ -98,7 +102,7 @@ Output MUST be strictly valid JSON matching this JSON schema:
     
     for (const modelName of candidateModels) {
       try {
-        const response = await ai.models.generateContent({
+        const callPromise = ai.models.generateContent({
           model: modelName,
           contents: `Premise: "${premise}"\n\nWrite a complete, authentic Wikipedia article as specified.`,
           config: {
@@ -107,12 +111,19 @@ Output MUST be strictly valid JSON matching this JSON schema:
             temperature: 0.7,
           },
         });
-        if (response.text) {
+
+        // 12 second timeout per attempt
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Timeout after 12s")), 12000)
+        );
+
+        const response = (await Promise.race([callPromise, timeoutPromise])) as { text?: string };
+        if (response && response.text) {
           rawText = response.text;
           break;
         }
       } catch (err: unknown) {
-        console.warn(`Model ${modelName} encountered error, trying fallback...`, (err as Error).message?.slice(0, 120));
+        console.warn(`Model ${modelName} attempt failed:`, (err as Error).message?.slice(0, 100));
       }
     }
 
